@@ -1,0 +1,106 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'Online Shopping Cart',
+      theme: ThemeData(
+        primarySwatch: Colors.pink,
+      ),
+      home: ProductScreen(),
+    );
+  }
+}
+
+class ProductScreen extends StatelessWidget {
+  final List<String> items = [
+    "Kurtis",
+    "Shawl",
+    "Saree",
+    "Half Saree"
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Online Shopping Cart"),
+      ),
+      body: ListView.builder(
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          return Card(
+            margin: EdgeInsets.all(10),
+            elevation: 5,
+            child: ListTile(
+              title: Text(
+                items[index],
+                style: TextStyle(fontSize: 18),
+              ),
+              trailing: ElevatedButton(
+                child: Text("Add to Cart"),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          SuccessScreen(itemName: items[index]),
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class SuccessScreen extends StatelessWidget {
+  final String itemName;
+
+  SuccessScreen({required this.itemName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Online Shopping"),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.check_circle,
+              color: Colors.green,
+              size: 80,
+            ),
+            SizedBox(height: 20),
+            Text(
+              "$itemName Successfully Added!",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            SizedBox(height: 30),
+            ElevatedButton(
+              child: Text("Back to Products"),
+              onPressed: () {
+                Navigator.pop(context);
+              },
+            )
+          ],
+        ),
+      ),
+    );
+  }
+}
