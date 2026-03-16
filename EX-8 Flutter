@@ -1,0 +1,135 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+void main() {
+  runApp(MyApp());
+}
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Text to Speech App',
+      debugShowCheckedModeBanner: false,
+      home: TTSPage(),
+    );
+  }
+}
+class TTSPage extends StatefulWidget {
+  @override
+  _TTSPageState createState() => _TTSPageState();
+}
+class _TTSPageState extends State<TTSPage> {
+  final FlutterTts flutterTts = FlutterTts();
+  final TextEditingController controller = TextEditingController();
+  double speechRate = 0.5;
+  String selectedLanguage = "en-US";
+  String error = "";
+  final Map<String, String> languages = {
+    "English": "en-US",
+    "Hindi": "hi-IN",
+    "Spanish": "es-ES",
+    "French": "fr-FR"
+  };
+  Future speak() async {
+String text = controller.text.trim();
+    if (text.isEmpty) {
+      setState(() {
+        error = "Please enter text to speak.";
+      });
+      return;
+    }
+    setState(() {
+      error = "";
+    });
+    await flutterTts.setLanguage(selectedLanguage);
+    await flutterTts.setSpeechRate(speechRate);
+    await flutterTts.speak(text);
+  }
+  Future stop() async {
+    await flutterTts.stop();
+  }
+  @override
+  void dispose() {
+    flutterTts.stop();
+    controller.dispose();
+    super.dispose();
+  }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text("Text To Speech"),
+        centerTitle: true,
+      ),
+      body: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: controller,
+              maxLines: 4,
+              decoration: InputDecoration(
+           labelText: "Enter text",
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 10),
+            if (error.isNotEmpty)
+              Text(
+                error,
+                style: TextStyle(color: Colors.red),
+              ),
+            SizedBox(height: 20),
+            /// LANGUAGE SELECTOR
+            Text("Select Language"),
+            DropdownButton<String>(
+              value: selectedLanguage,
+              isExpanded: true,
+              items: languages.entries.map((entry) {
+                return DropdownMenuItem(
+                  value: entry.value,
+                  child: Text(entry.key),
+                );
+              }).toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedLanguage = value!;
+                });
+              },
+            ),
+            SizedBox(height: 20),
+            Text("Speech Rate: ${speechRate.toStringAsFixed(2)}"),
+            Slider(
+              min: 0.1,
+              max: 1.0,
+              value: speechRate,
+              onChanged: (value) {
+                setState(() {
+                  speechRate = value;
+                });
+              },
+            ),
+            SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton(
+                  onPressed: speak,
+                  child: Text("Speak"),
+                ),
+                ElevatedButton(
+                  onPressed: stop,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                  ),
+                  child: Text("Stop"),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
